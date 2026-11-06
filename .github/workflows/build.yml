@@ -12,33 +12,26 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: 'zulu'
           java-version: 17
 
-      - name: Setup Android SDK
+      - name: Setup Android SDK Tools
         uses: android-actions/setup-android@v3
 
-      - name: Install Dependencies
-        run: npm install
-
-      - name: Build Android APK
+      - name: Make Scripts Executable
         run: |
-          if [ -d "android" ]; then
-            cd android && chmod +x gradlew && ./gradlew assembleRelease
-          else
-            npx react-native build-android --mode=release
-          fi
+          chmod +x build_apk.sh
+          [ -f install_android_sdk.sh ] && chmod +x install_android_sdk.sh || true
+
+      - name: Run Build Script
+        run: |
+          ./build_apk.sh
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: WalkieTalkie-App
-          path: '**/build/outputs/apk/**/*.apk'
+          name: WalkieTalkie-APK
+          path: '**/*.apk'
